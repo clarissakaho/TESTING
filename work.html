@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIA — Past Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #f5f0e8; --ink: #1a1814; --ink-light: #6b6560;
+    --ink-faint: #b5b0a8; --rule: #d8d2c8;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  html, body { width:100%; height:100%; overflow:hidden; background:var(--cream); cursor:none; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity:0.03; pointer-events:none; z-index:400;
+  }
+  #cursor { position:fixed; width:7px; height:7px; background:var(--ink); border-radius:50%; pointer-events:none; z-index:999; transform:translate(-50%,-50%); }
+  #cursor-ring { position:fixed; width:28px; height:28px; border:1px solid var(--ink-faint); border-radius:50%; pointer-events:none; z-index:998; transform:translate(-50%,-50%); transition:width .3s,height .3s; }
+
+  .back {
+    position:fixed; top:2rem; left:2.8rem; z-index:100;
+    font-family:var(--font-mono); font-size:0.58rem; letter-spacing:0.2em;
+    color:var(--ink-faint); text-transform:uppercase; text-decoration:none; cursor:none;
+    display:flex; align-items:center; gap:0.6rem;
+    opacity:0; animation:fadeIn 0.7s ease forwards 0.3s;
+    transition:color 0.2s;
+  }
+  .back:hover { color:var(--ink); }
+
+  .page {
+    position:fixed; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:4rem 3rem;
+    opacity:0; animation:fadeIn 0.8s ease forwards 0.2s;
+  }
+
+  .label {
+    font-family:var(--font-mono); font-size:0.58rem;
+    letter-spacing:0.25em; color:var(--ink-faint);
+    text-transform:uppercase; margin-bottom:2rem;
+  }
+  h1 {
+    font-family:var(--font-serif); font-weight:300;
+    font-size:clamp(3rem,10vw,7rem); letter-spacing:0.08em;
+    color:var(--ink); line-height:1; text-align:center;
+    margin-bottom:2rem;
+  }
+  .rule { width:40px; height:1px; background:var(--rule); margin:0 auto 2rem; }
+  p {
+    font-family:var(--font-serif); font-style:italic; font-weight:300;
+    font-size:clamp(0.9rem,1.8vw,1.2rem); color:var(--ink-light);
+    text-align:center; letter-spacing:0.02em; line-height:1.7;
+    max-width:440px;
+  }
+
+  .corner {
+    position:fixed; font-family:var(--font-mono); font-size:0.52rem;
+    letter-spacing:0.15em; color:var(--ink-faint); text-transform:uppercase; line-height:1.9;
+    opacity:0; animation:fadeIn 0.6s ease forwards 0.5s;
+  }
+  .bl { bottom:2rem; left:2.8rem; }
+  .br { bottom:2rem; right:2.8rem; text-align:right; }
+
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @media(max-width:600px){ body{cursor:auto;} #cursor,#cursor-ring{display:none;} }
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<a href="index.html" class="back">← back</a>
+<div class="page">
+  <div class="label">002 — past work</div>
+  <h1>Classified<br>for now.</h1>
+  <div class="rule"></div>
+  <p>Case files are being declassified.<br>Intelligence drops soon.</p>
+</div>
+<div class="corner bl">CIA · past work</div>
+<div class="corner br">cult.intelligence.agency</div>
+<script>
+  const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+  let mx=-100,my=-100,rx=-100,ry=-100;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function tick(){cur.style.left=mx+'px';cur.style.top=my+'px';rx+=(mx-rx)*.13;ry+=(my-ry)*.13;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+</script>
+</body>
+</html>

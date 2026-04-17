@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIA — About</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream:      #f0ebe0;
+    --cream-dark: #e0d8c4;
+    --ink:        #1a1814;
+    --ink-light:  #3a3530;
+    --ink-faint:  #5a5248;
+    --green:      #7a8c5c;
+    --green-dark: #566040;
+    --green-pale: #c8d4a8;
+    --pixel:      'Press Start 2P', monospace;
+    --serif:      'Cormorant Garamond', Georgia, serif;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--cream);
+    font-family: var(--serif);
+    cursor: none;
+  }
+
+  /* grain */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 800;
+    mix-blend-mode: screen;
+  }
+
+  /* ── CURSOR ── */
+  #cursor {
+    position: fixed;
+    width: 14px; height: 20px;
+    background: var(--cream);
+    pointer-events: none;
+    z-index: 1000;
+    clip-path: polygon(0 0, 55% 0, 100% 45%, 55% 45%, 55% 100%, 0 55%);
+    image-rendering: pixelated;
+  }
+
+  /* ── FULL PAGE GRID ── */
+  .page {
+    position: fixed; inset: 0;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 2rem;
+    border-bottom: 2px solid rgba(240,235,224,0.12);
+    background: var(--ink);
+    z-index: 50;
+    flex-shrink: 0;
+  }
+
+  .back-btn {
+    font-family: var(--pixel);
+    font-size: 0.36rem;
+    color: var(--cream);
+    text-decoration: none;
+    cursor: none;
+    letter-spacing: 0.1em;
+    opacity: 0.55;
+    border: 2px solid rgba(240,235,224,0.2);
+    padding: 0.4rem 0.7rem;
+    transition: opacity 0.1s step-end, border-color 0.1s step-end;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .back-btn::before { content: '◀ '; }
+  .back-btn:hover { opacity: 1; border-color: rgba(240,235,224,0.6); }
+
+  .top-center {
+    font-family: var(--pixel);
+    font-size: 0.38rem;
+    color: rgba(240,235,224,0.5);
+    letter-spacing: 0.18em;
+  }
+
+  .top-right {
+    font-family: var(--pixel);
+    font-size: 0.3rem;
+    color: var(--green);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── CONTENT AREA ── */
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* ── SERVICE COLUMN ── */
+  .col {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(240,235,224,0.1);
+    overflow: hidden;
+    padding: 0;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .col:last-child { border-right: none; }
+  .col.visible { opacity: 1; transform: translateY(0); }
+  .col:nth-child(2) { transition-delay: 0.1s; }
+  .col:nth-child(3) { transition-delay: 0.2s; }
+
+  /* visual panel — takes up top ~40% */
+  .col-visual {
+    flex: 0 0 38%;
+    background: #201e18;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* halftone dots on visual */
+  .col-visual::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(240,235,224,0.06) 1px, transparent 1px);
+    background-size: 7px 7px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .col-visual svg {
+    width: 52%;
+    height: auto;
+    position: relative; z-index: 3;
+    filter: drop-shadow(4px 8px 0px rgba(0,0,0,0.6));
+  }
+
+  /* category label overlaid on visual, bottom-left */
+  .col-cat {
+    position: absolute;
+    bottom: 1rem; left: 1.2rem;
+    font-family: var(--pixel);
+    font-size: clamp(0.5rem, 1.8vw, 0.85rem);
+    color: var(--cream);
+    letter-spacing: 0.1em;
+    text-shadow: 2px 2px 0 var(--green-dark);
+    z-index: 4;
+    opacity: 0.9;
+  }
+  .col-num-overlay {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    font-family: var(--pixel);
+    font-size: 0.28rem;
+    color: var(--green);
+    letter-spacing: 0.12em;
+    z-index: 4;
+  }
+
+  /* text panel — takes remaining space */
+  .col-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.4rem 1.6rem 1.2rem;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .col-tagline {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+    color: rgba(240,235,224,0.5);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+  }
+
+  .col-rule {
+    width: 100%; height: 1px;
+    background: rgba(240,235,224,0.12);
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* service items — 2 column grid */
+  .col-items {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-content: start;
+    overflow: hidden;
+  }
+
+  .col-item {
+    font-family: var(--pixel);
+    font-size: clamp(0.22rem, 0.7vw, 0.32rem);
+    color: rgba(240,235,224,0.42);
+    letter-spacing: 0.06em;
+    line-height: 1;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(240,235,224,0.06);
+    text-transform: uppercase;
+    transition: color 0.1s step-end;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .col-item:hover { color: var(--green-pale); }
+
+  /* ── BOTTOM TICKER ── */
+  .ticker {
+    border-top: 2px solid var(--green);
+    background: var(--green);
+    padding: 0.5rem 0;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .ticker::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px);
+    background-size: 5px 5px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .ticker-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 20s linear infinite;
+    position: relative; z-index: 2;
+  }
+  .ticker-track span {
+    font-family: var(--pixel);
+    font-size: 0.32rem;
+    letter-spacing: 0.14em;
+    color: var(--cream);
+    padding-right: 2.5rem;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+  .ticker-track .sep { opacity: 0.3; }
+
+  /* ── STAR ANIMATIONS ── */
+  @keyframes starFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+  @keyframes starFloat2 { 0%,100%{transform:translateY(0) rotate(22.5deg)} 50%{transform:translateY(-7px) rotate(22.5deg)} }
+  @keyframes starFloat3 { 0%,100%{transform:translateY(0) rotate(-15deg)} 50%{transform:translateY(-7px) rotate(-15deg)} }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    #cursor { display: none; }
+    .content { grid-template-columns: 1fr; overflow-y: auto; }
+    html, body { overflow: auto; }
+    .page { position: relative; }
+    .col { border-right: none; border-bottom: 1px solid rgba(240,235,224,0.1); }
+    .col-visual { flex: 0 0 200px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <a href="index.html" class="back-btn">HOME</a>
+    <div class="top-center">CIA · ABOUT</div>
+    <div class="top-right">▸ INTELLIGENCE DOSSIER</div>
+  </div>
+
+  <!-- 3-COLUMN CONTENT -->
+  <div class="content">
+
+    <!-- COL 1: INTELLIGENCE -->
+    <div class="col" id="c1">
+      <div class="col-visual">
+        <div class="col-num-overlay">▸ 001</div>
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="animation: starFloat 4s ease-in-out infinite;">
+          <defs>
+            <radialGradient id="g1" cx="35%" cy="30%" r="65%">
+              <stop offset="0%"   stop-color="#c8d4a8"/>
+              <stop offset="45%"  stop-color="#8aaa58"/>
+              <stop offset="80%"  stop-color="#566040"/>
+              <stop offset="100%" stop-color="#3a4828"/>
+            </radialGradient>
+            <clipPath id="c1cp">
+              <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"/>
+            </clipPath>
+            <pattern id="d1" x="0" y="0" width="5" height="5" patternUnits="userSpaceOnUse">
+              <circle cx="2.5" cy="2.5" r="0.8" fill="rgba(0,0,0,0.15)"/>
+            </pattern>
+          </defs>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="#3a4828" opacity="0.5" transform="translate(5,8)"/>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="url(#g1)" stroke="#2a3818" stroke-width="1.5" stroke-linejoin="round"/>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="url(#d1)" opacity="0.5" clip-path="url(#c1cp)"/>
+          <ellipse cx="78" cy="55" rx="24" ry="14" fill="white" opacity="0.15"
+            transform="rotate(-18,78,55)" clip-path="url(#c1cp)"/>
+          <rect x="97" y="85" width="6" height="30" fill="#1a2810" opacity="0.3"/>
+          <rect x="85" y="97" width="30" height="6" fill="#1a2810" opacity="0.3"/>
+        </svg>
+        <div class="col-cat">INTELLIGENCE</div>
+      </div>
+      <div class="col-body">
+        <div class="col-tagline">We map everything — brand, market, culture, consumer.</div>
+        <div class="col-rule"></div>
+        <div class="col-items">
+          <div class="col-item">Brand discovery</div>
+          <div class="col-item">Competitive mapping</div>
+          <div class="col-item">Consumer profiling</div>
+          <div class="col-item">Cultural audit</div>
+          <div class="col-item">Positioning strategy</div>
+          <div class="col-item">Voice & tone</div>
+          <div class="col-item">Narrative framework</div>
+          <div class="col-item">Visual direction</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL 2: ARCHITECTURE -->
+    <div class="col" id="c2">
+      <div class="col-visual">
+        <div class="col-num-overlay">▸ 002</div>
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="animation: starFloat2 5s ease-in-out infinite 0.5s;">
+          <defs>
+            <radialGradient id="g2" cx="40%" cy="28%" r="62%">
+              <stop offset="0%"   stop-color="#d8e4b8"/>
+              <stop offset="40%"  stop-color="#9ab868"/>
+              <stop offset="78%"  stop-color="#607848"/>
+              <stop offset="100%" stop-color="#3a5028"/>
+            </radialGradient>
+            <clipPath id="c2cp">
+              <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"/>
+            </clipPath>
+            <pattern id="d2" x="0" y="0" width="5" height="5" patternUnits="userSpaceOnUse">
+              <circle cx="2.5" cy="2.5" r="0.8" fill="rgba(0,0,0,0.15)"/>
+            </pattern>
+          </defs>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="#3a5028" opacity="0.5" transform="translate(5,8)"/>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="url(#g2)" stroke="#2a4018" stroke-width="1.5" stroke-linejoin="round"/>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="url(#d2)" opacity="0.5" clip-path="url(#c2cp)"/>
+          <ellipse cx="80" cy="52" rx="26" ry="15" fill="white" opacity="0.18"
+            transform="rotate(-20,80,52)" clip-path="url(#c2cp)"/>
+          <rect x="97" y="85" width="6" height="30" fill="#1a3010" opacity="0.3"/>
+          <rect x="85" y="97" width="30" height="6" fill="#1a3010" opacity="0.3"/>
+          <rect x="94" y="94" width="12" height="12" fill="none" stroke="#1a3010" stroke-width="1" opacity="0.4"/>
+        </svg>
+        <div class="col-cat">ARCHITECTURE</div>
+      </div>
+      <div class="col-body">
+        <div class="col-tagline">We build the system that holds it all together.</div>
+        <div class="col-rule"></div>
+        <div class="col-items">
+          <div class="col-item">Brand engine build</div>
+          <div class="col-item">AI system design</div>
+          <div class="col-item">Source of truth doc</div>
+          <div class="col-item">Prompt library</div>
+          <div class="col-item">Tool stack setup</div>
+          <div class="col-item">Workflow design</div>
+          <div class="col-item">Brand guidelines</div>
+          <div class="col-item">Asset architecture</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL 3: OPERATIONS -->
+    <div class="col" id="c3">
+      <div class="col-visual">
+        <div class="col-num-overlay">▸ 003</div>
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="animation: starFloat3 3.5s ease-in-out infinite 1s;">
+          <defs>
+            <radialGradient id="g3" cx="32%" cy="35%" r="68%">
+              <stop offset="0%"   stop-color="#b8c898"/>
+              <stop offset="50%"  stop-color="#788c50"/>
+              <stop offset="82%"  stop-color="#506038"/>
+              <stop offset="100%" stop-color="#304020"/>
+            </radialGradient>
+            <clipPath id="c3cp">
+              <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"/>
+            </clipPath>
+            <pattern id="d3" x="0" y="0" width="5" height="5" patternUnits="userSpaceOnUse">
+              <circle cx="2.5" cy="2.5" r="0.8" fill="rgba(0,0,0,0.15)"/>
+            </pattern>
+          </defs>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="#304020" opacity="0.5" transform="translate(5,8)"/>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="url(#g3)" stroke="#203018" stroke-width="1.5" stroke-linejoin="round"/>
+          <polygon points="100,15 115,70 170,70 128,105 143,160 100,128 57,160 72,105 30,70 85,70"
+            fill="url(#d3)" opacity="0.5" clip-path="url(#c3cp)"/>
+          <ellipse cx="76" cy="58" rx="22" ry="13" fill="white" opacity="0.14"
+            transform="rotate(-15,76,58)" clip-path="url(#c3cp)"/>
+          <rect x="97" y="85" width="6" height="30" fill="#182810" opacity="0.3"/>
+          <rect x="85" y="97" width="30" height="6" fill="#182810" opacity="0.3"/>
+        </svg>
+        <div class="col-cat">OPERATIONS</div>
+      </div>
+      <div class="col-body">
+        <div class="col-tagline">Intelligence delivered to your team, ongoing.</div>
+        <div class="col-rule"></div>
+        <div class="col-items">
+          <div class="col-item">Brand management</div>
+          <div class="col-item">Team training</div>
+          <div class="col-item">AI model tuning</div>
+          <div class="col-item">Dynamic evolution</div>
+          <div class="col-item">Quarterly audits</div>
+          <div class="col-item">Cultural monitoring</div>
+          <div class="col-item">Expansion strategy</div>
+          <div class="col-item">Advisory retainer</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM TICKER -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <span>INTELLIGENCE</span><span class="sep"> ★ </span>
+      <span>ARCHITECTURE</span><span class="sep"> ★ </span>
+      <span>OPERATIONS</span><span class="sep"> ★ </span>
+      <span>BRAND ENGINE</span><span class="sep"> ★ </span>
+      <span>SINGLE SOURCE OF TRUTH</span><span class="sep"> ★ </span>
+      <span>CULT FOLLOWING</span><span class="sep"> ★ </span>
+      <span>BORDERLESS BRANDS</span><span class="sep"> ★ </span>
+      <span>INTELLIGENCE</span><span class="sep"> ★ </span>
+      <span>ARCHITECTURE</span><span class="sep"> ★ </span>
+      <span>OPERATIONS</span><span class="sep"> ★ </span>
+      <span>BRAND ENGINE</span><span class="sep"> ★ </span>
+      <span>SINGLE SOURCE OF TRUTH</span><span class="sep"> ★ </span>
+      <span>CULT FOLLOWING</span><span class="sep"> ★ </span>
+      <span>BORDERLESS BRANDS</span><span class="sep"> ★ </span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const cur = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+  });
+
+  // reveal columns on load
+  setTimeout(() => {
+    document.querySelectorAll('.col').forEach(c => c.classList.add('visible'));
+  }, 100);
+</script>
+</body>
+</html>
